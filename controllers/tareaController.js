@@ -20,7 +20,6 @@ exports.crearTarea = async (req, res) => {
         if(!proyectoActual) {
             return res.status(404).json({msg: 'Proyecto no encontrado'})
         }
-        console.log(proyectoActual);
         // Revisar si el proyecto actual pertece al usuario autenticado
         if(proyectoActual.creador.toString() !== req.usuario.id) {
             return res.status(401).json({msg: 'No Autorizado'});
@@ -45,8 +44,10 @@ exports.obtenerTareas = async (req, res) => {
     
     try {
         
-        const { proyecto } = req.body;
+        const { proyecto } = req.query;
+
         const proyectoActual = await Proyecto.findById(proyecto);
+
         if(!proyectoActual) {
             return res.status(404).json({msg: 'Proyecto no encontrado'})
         }
@@ -56,7 +57,7 @@ exports.obtenerTareas = async (req, res) => {
         }
 
         // Obtener tareas por proyecto
-        const tareas = await Tarea.find({ proyecto });
+        const tareas = await Tarea.find({ proyecto }).sort({ creado: -1});
         res.json({ tareas });
 
     } catch (error) {
@@ -97,8 +98,8 @@ exports.actualizarTarea = async(req, res) => {
         // Crear un objeto con la nueva información
         const  nuevaTarea = {};
 
-        if(nombre) nuevaTarea.nombre = nombre;
-        if(estado) nuevaTarea.estado = estado;
+        nuevaTarea.nombre = nombre;
+        nuevaTarea.estado = estado;
 
         // Guardar la tarea
 
@@ -117,12 +118,14 @@ exports.actualizarTarea = async(req, res) => {
 exports.eliminarTarea = async(req, res) => { 
 
     try {
+
+
+        const { proyecto } = req.query;
         // revisar el ID
         let tarea = await Tarea.findById(req.params.id);
 
-        const {proyecto} = tarea;
         const proyectoTarea = await Proyecto.findById(proyecto);
-        // Revisar si el proyecto actual pertece al usuario autenticado
+        //Revisar si el proyecto actual pertece al usuario autenticado
         if(proyectoTarea.creador.toString() !== req.usuario.id) {
             return res.status(401).json({msg: 'No Autorizado'});
         }

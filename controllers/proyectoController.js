@@ -57,7 +57,7 @@ exports.actualizarProyecto = async(req, res) => {
 
     try {
         // revisar el ID
-        let proyecto = await Proyecto.findById(req.params.id);
+        let proyecto = await Proyecto.findById(req.query.id);
 
 
         // Si el proyecto eiste
@@ -69,7 +69,7 @@ exports.actualizarProyecto = async(req, res) => {
             return res.status(401).json({msg: 'No Autorizado'});
         }
         // actualiar
-        proyecto = await Proyecto.findByIdAndUpdate({_id: req.params.id }, 
+        proyecto = await Proyecto.findByIdAndUpdate({_id: req.query.id }, 
             { $set : nuevoProyecto}, { new: true });
 
         res.json({proyecto});
